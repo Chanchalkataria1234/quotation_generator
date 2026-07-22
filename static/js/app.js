@@ -686,7 +686,7 @@ async function downloadPDF() {
 
             html2canvas: {
                 // Lower scale prevents iPhone memory/canvas problems
-                scale: 1.2,
+                scale: isMobile ? 1.2 : 1.5,
                 useCORS: true,
                 allowTaint: false,
                 logging: false,
@@ -703,8 +703,8 @@ async function downloadPDF() {
             },
 
             pagebreak: {
-                mode: ["css", "legacy"],
-                after: [".page-break"]
+                mode: [],
+
             }
         };
 
