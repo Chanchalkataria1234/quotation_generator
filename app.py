@@ -1,6 +1,6 @@
 import os
 import json
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, send_from_directory
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
@@ -131,7 +131,7 @@ def save_config(config_data):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return send_from_directory('.', 'index.html')
 
 @app.route('/api/config', methods=['GET'])
 def get_config():

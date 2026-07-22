@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,30 +7,25 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Inter:wght@400;500;600&family=Montserrat:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Inter:wght@400;500;600&family=Montserrat:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
   <!-- html2pdf.js library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
-    integrity="sha512-Ap2dO/S4qP2h7H9u4M9jF8z/zF1pW2/2A169n+A/b3gQ8k9z2Xf1qT7K5z/A169n+A/b3g==" crossorigin="anonymous"
-    referrerpolicy="no-referrer"></script>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-Ap2dO/S4qP2h7H9u4M9jF8z/zF1pW2/2A169n+A/b3gQ8k9z2Xf1qT7K5z/A169n+A/b3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  
   <!-- CSS Styles -->
-  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="static/css/style.css">
 </head>
-
 <body>
 
   <div class="app-container">
-
+    
     <!-- Sidebar Control Panel -->
     <div class="editor-sidebar">
       <div class="sidebar-header">
         <div class="logo-icon">Q</div>
         <h2>Quotation Editor</h2>
       </div>
-
+      
       <div class="sidebar-content">
         <!-- Resort Information -->
         <div class="form-section">
@@ -48,8 +42,7 @@
           </div>
           <div class="form-group" style="margin-top: 10px;">
             <label for="resort_footer">Footer Text</label>
-            <input type="text" id="resort_footer"
-              value="Meera Valley Resort By Nexottel | Udaipur | Quotation subject to availability">
+            <input type="text" id="resort_footer" value="Meera Valley Resort By Nexottel | Udaipur | Quotation subject to availability">
           </div>
         </div>
 
@@ -149,8 +142,7 @@
         <!-- Meal Plan Price Adjustments -->
         <div class="form-section">
           <div class="section-title">Meal Rates (per person / night)</div>
-          <div
-            style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 10px;">
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 10px;">
             <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer;">
               <input type="checkbox" id="include_pkg_room_only" checked style="width: auto; margin: 0;"> Room Only
             </label>
@@ -233,7 +225,7 @@
           <button type="button" class="btn-add-item" id="add-note-item">+ Add Note</button>
         </div>
       </div>
-
+      
       <div class="sidebar-footer">
         <button id="btn-save" class="btn-primary" style="width: 100%;">Save New Defaults</button>
         <div style="display: flex; gap: 10px;">
@@ -244,7 +236,7 @@
 
     <!-- Live Preview Screen -->
     <div class="preview-container">
-
+      
       <!-- Top Action Ribbon -->
       <div class="preview-actions">
         <button id="btn-download-pdf" class="btn-primary">
@@ -259,13 +251,13 @@
 
       <!-- Printable area representing A4 margins -->
       <div id="preview-workspace" style="display: flex; flex-direction: column; gap: 20px;">
-
+        
         <!-- PAGE 1 -->
         <div class="pdf-page" id="page-1">
           <div class="pdf-content">
             <!-- Header -->
             <div class="pdf-header">
-              <img src="/static/meera_valley_logo.jpg" alt="Meera Valley Resort By Nexottel"
+              <img src="static/meera_valley_logo.jpg" alt="Meera Valley Resort By Nexottel"
                 style="height: 120px; object-fit: contain; margin-bottom: 5px;">
               <div class="quotation-title">PREMIUM STAY QUOTATION</div>
             </div>
@@ -350,7 +342,7 @@
           <div class="pdf-content">
             <!-- Header -->
             <div class="pdf-header">
-              <img src="/static/meera_valley_logo.jpg" alt="Meera Valley Resort By Nexottel"
+              <img src="static/meera_valley_logo.jpg" alt="Meera Valley Resort By Nexottel"
                 style="height: 120px; object-fit: contain; margin-bottom: 5px;">
               <div class="quotation-title" style="border: none; font-size: 16px; margin-top: 5px;">Meal Details</div>
               <div style="font-size: 11px; color: var(--text-muted); font-weight: 500; margin-top: 2px;">
@@ -360,22 +352,7 @@
 
             <!-- Meal Matrix -->
             <div class="meal-grid">
-              <div class="meal-col">
-                <div class="meal-header">Breakfast</div>
-                <ul class="meal-items" id="pv-menu-breakfast"></ul>
-              </div>
-              <div class="meal-col">
-                <div class="meal-header">Lunch</div>
-                <ul class="meal-items" id="pv-menu-lunch"></ul>
-              </div>
-              <div class="meal-col">
-                <div class="meal-header">Hi Tea</div>
-                <ul class="meal-items" id="pv-menu-hi_tea"></ul>
-              </div>
-              <div class="meal-col">
-                <div class="meal-header">Dinner</div>
-                <ul class="meal-items" id="pv-menu-dinner"></ul>
-              </div>
+              <!-- Generated dynamically by JavaScript -->
             </div>
 
             <!-- Important Notes -->
@@ -407,7 +384,6 @@
   </div>
 
   <!-- App logic -->
-  <script src="/static/js/app.js"></script>
+  <script src="static/js/app.js"></script>
 </body>
-
 </html>

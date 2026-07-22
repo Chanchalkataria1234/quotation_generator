@@ -5,67 +5,151 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
 });
 
-// Fetch current configuration from Flask backend
+const DEFAULT_CONFIG = {
+  "resort_info": {
+    "name": "MEERA VALLEY RESORT",
+    "subtitle": "By Nexottel - Udaipur",
+    "footer": "Meera Valley Resort By Nexottel | Udaipur | Quotation subject to availability"
+  },
+  "included_meals": {
+    "breakfast": true,
+    "lunch": true,
+    "hi_tea": true,
+    "dinner": true
+  },
+  "included_packages": {
+    "room_only": true,
+    "cp": true,
+    "map": true,
+    "ap": true,
+    "ap_hi_tea": true
+  },
+  "included_rooms": {
+    "double": true,
+    "triple": true,
+    "quad": true
+  },
+  "booking_defaults": {
+    "check_in": "2026-07-26T13:00",
+    "check_out": "2026-07-27T10:00",
+    "guests": 25,
+    "guest_status": "Returning / Old Guest"
+  },
+  "rooms": {
+    "triple": {
+      "quantity": 7,
+      "rate": 2000,
+      "inclusion": "1 mattress included in each room"
+    },
+    "double": {
+      "quantity": 2,
+      "rate": 1800,
+      "inclusion": "Double occupancy"
+    },
+    "quad": {
+      "quantity": 0,
+      "rate": 2400,
+      "inclusion": "Quad occupancy"
+    }
+  },
+  "meal_rates": {
+    "cp": 250,
+    "map": 600,
+    "ap": 950,
+    "ap_hi_tea": 1250
+  },
+  "menus": {
+    "breakfast": [
+      "Chole Bature",
+      "Poha",
+      "Bread Butter",
+      "Tea & Coffee"
+    ],
+    "lunch": [
+      "Dal Fry",
+      "Paneer Lababdar",
+      "Sev Tomato",
+      "Jeera Rice",
+      "Tawa Roti",
+      "Papad",
+      "Achar",
+      "Green Salad",
+      "Rasmalai"
+    ],
+    "hi_tea": [
+      "Peanut Salad",
+      "Paneer Chilli",
+      "Mix Pakora",
+      "Green Salad",
+      "Biscuit",
+      "Tea",
+      "Coffee"
+    ],
+    "dinner": [
+      "Dal Tadka",
+      "Paneer Butter Masala",
+      "Mix Veg",
+      "Jeera Rice",
+      "Tawa Roti",
+      "Papad",
+      "Achar",
+      "Green Salad",
+      "Gulab Jamun"
+    ]
+  },
+  "important_notes": [
+    "Mattress charges are already included in the quoted room rates.",
+    "Check-in Time: 1:00 PM.",
+    "Check-out Time: 10:00 AM.",
+    "40% advance payment is required for booking confirmation.",
+    "Remaining payment must be cleared before check-in.",
+    "No refund will be applicable within 15 days of arrival.",
+    "The special old-guest discount is already included in the above prices.",
+    "Hi Tea rate is ₹300 per person, included in the AP + Hi Tea package total.",
+    "Final booking is subject to room availability at the time of confirmation."
+  ]
+};
+
+// Fetch current configuration from localStorage or fallback to defaults
 function fetchConfig() {
-    fetch('/api/config')
-        .then(response => response.json())
-        .then(data => {
-            configData = data;
+    const localData = localStorage.getItem('resort_config');
+    if (localData) {
+        try {
+            configData = JSON.parse(localData);
             initializeForm();
             updatePreview();
-        })
-        .catch(err => {
-            console.error('Error fetching config:', err);
-            alert('Failed to load configuration.');
-        });
+            return;
+        } catch (e) {
+            console.error('Error parsing localStorage config, falling back to defaults', e);
+        }
+    }
+    // Fallback to embedded defaults
+    configData = JSON.parse(JSON.stringify(DEFAULT_CONFIG)); // Deep copy defaults
+    initializeForm();
+    updatePreview();
 }
 
-// Save current configuration to Flask backend
+// Save current configuration to localStorage
 function saveConfig() {
     collectFormData();
-    fetch('/api/config', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(configData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            alert('Configuration saved successfully!');
-            updatePreview();
-        } else {
-            alert('Error saving configuration: ' + data.error);
-        }
-    })
-    .catch(err => {
-        console.error('Error saving config:', err);
+    try {
+        localStorage.setItem('resort_config', JSON.stringify(configData));
+        alert('Configuration saved successfully in browser storage!');
+        updatePreview();
+    } catch (err) {
+        console.error('Error saving config to localStorage:', err);
         alert('Failed to save configuration.');
-    });
+    }
 }
 
 // Reset configuration to factory defaults
 function resetConfig() {
     if (confirm('Are you sure you want to reset all configurations to default values?')) {
-        fetch('/api/config/reset', {
-            method: 'POST'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                configData = data.config;
-                initializeForm();
-                updatePreview();
-                alert('Configuration reset to defaults.');
-            } else {
-                alert('Error resetting configuration: ' + data.error);
-            }
-        })
-        .catch(err => {
-            console.error('Error resetting config:', err);
-            alert('Failed to reset configuration.');
-        });
+        localStorage.removeItem('resort_config');
+        configData = JSON.parse(JSON.stringify(DEFAULT_CONFIG)); // Deep copy defaults
+        initializeForm();
+        updatePreview();
+        alert('Configuration reset to defaults.');
     }
 }
 
