@@ -700,11 +700,6 @@ async function downloadPDF() {
                 format: "a4",
                 orientation: "portrait",
                 compress: true
-            },
-
-            pagebreak: {
-                mode: [],
-
             }
         };
 
