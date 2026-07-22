@@ -3,13 +3,6 @@ let configData = {};
 document.addEventListener('DOMContentLoaded', () => {
     fetchConfig();
     setupEventListeners();
-    
-    // Ping backend to wake it up if it is sleeping (e.g. Render free tier)
-    let pingUrl = '/api/config';
-    if (window.location.hostname.includes('github.io')) {
-        pingUrl = 'https://stay-quotation-generator.onrender.com/api/config';
-    }
-    fetch(pingUrl).catch(err => console.log("Background wake-up ping failed:", err));
 });
 
 const DEFAULT_CONFIG = {
@@ -639,41 +632,72 @@ function updatePreview() {
     });
 }
 
-// Generate & Download PDF
+// Generate & Download/Preview PDF
 function downloadPDF() {
     // Collect latest form data first to ensure it's up to date
     collectFormData();
 
-    // Determine the correct API endpoint
-    let apiUrl = '/api/generate-pdf';
-    if (window.location.hostname.includes('github.io')) {
-        apiUrl = 'https://stay-quotation-generator.onrender.com/api/generate-pdf';
-    }
+    const element = document.getElementById('preview-workspace');
+    const resortName = configData.resort_info.name || 'Resort';
+    const filename = `Quotation_${resortName.replace(/\s+/g, '_')}.pdf`;
 
-    // Add loading feedback (visual indicator that reverts after 5 seconds)
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    // Set html2pdf options
+    const opt = {
+        margin:       0,
+        filename:     filename,
+        image:        { type: 'jpeg', quality: 0.95 },
+        html2canvas:  { 
+            scale: 1.8, // Safe scale for mobile canvas memory limits
+            useCORS: true,
+            logging: false,
+            letterRendering: true
+        },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak:    { mode: ['css', 'legacy'] }
+    };
+
+    // Add loading feedback
     const btn = document.getElementById('btn-download-pdf');
     const originalText = btn.innerHTML;
     btn.innerHTML = 'Generating PDF...';
     btn.disabled = true;
-    setTimeout(() => {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    }, 5000);
 
-    // Create a hidden form to submit synchronously (avoiding async download blocks on iOS Safari)
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = apiUrl;
-    form.style.display = 'none';
+    if (isMobile) {
+        // Pre-open a blank window synchronously to bypass iOS Safari pop-up blocker
+        const newWindow = window.open("", "_blank");
+        if (newWindow) {
+            newWindow.document.title = "Generating PDF...";
+            newWindow.document.body.innerHTML = "<h2 style='font-family:sans-serif; text-align:center; margin-top:20%; color:#157366;'>Generating your PDF. Please wait...</h2>";
+        }
 
-    // Add the data as a hidden input
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'data';
-    input.value = JSON.stringify(configData);
-    form.appendChild(input);
-
-    document.body.appendChild(form);
-    form.submit();
-    document.body.removeChild(form);
+        html2pdf().set(opt).from(element).toPdf().output('blob').then(blob => {
+            const url = URL.createObjectURL(blob);
+            if (newWindow) {
+                newWindow.location.href = url;
+            } else {
+                window.location.href = url;
+            }
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }).catch(err => {
+            console.error('PDF generation error:', err);
+            alert('Failed to generate PDF. Check console logs.');
+            if (newWindow) newWindow.close();
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+    } else {
+        // Desktop: Direct download using html2pdf's save method
+        html2pdf().set(opt).from(element).save().then(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }).catch(err => {
+            console.error('PDF generation error:', err);
+            alert('Failed to generate PDF. Check console logs.');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+    }
 }
