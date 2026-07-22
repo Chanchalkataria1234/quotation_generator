@@ -640,22 +640,18 @@ async function downloadPDF() {
     const btn = document.getElementById("btn-download-pdf");
     const originalText = btn.innerHTML;
 
-    const resortName = configData.resort_info.name || "Resort";
-    const filename =
-        `Quotation_${resortName.replace(/\s+/g, "_")}.pdf`;
-
     btn.innerHTML = "Generating PDF...";
     btn.disabled = true;
 
     document.body.classList.add("is-generating-pdf");
 
     try {
-        // Wait for fonts before capturing the quotation
+        // Wait until fonts are ready
         if (document.fonts && document.fonts.ready) {
             await document.fonts.ready;
         }
 
-        // Wait for all images, including the resort logo
+        // Wait until all quotation images are loaded
         const images = Array.from(
             document.querySelectorAll("#preview-workspace img")
         );
@@ -673,51 +669,81 @@ async function downloadPDF() {
             })
         );
 
-        const element = document.getElementById("preview-workspace");
+        const pages = Array.from(
+            document.querySelectorAll("#preview-workspace .pdf-page")
+        );
 
-        const options = {
-            margin: 0,
-            filename: filename,
+        if (!pages.length) {
+            throw new Error("No PDF pages were found.");
+        }
 
-            image: {
-                type: "jpeg",
-                quality: 0.92
-            },
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+            throw new Error("jsPDF library is not available.");
+        }
 
-            html2canvas: {
-                // Lower scale prevents iPhone memory/canvas problems
-                scale: isMobile ? 1.2 : 1.5,
+        const { jsPDF } = window.jspdf;
+
+        const pdf = new jsPDF({
+            orientation: "portrait",
+            unit: "mm",
+            format: "a4",
+            compress: true
+        });
+
+        for (let index = 0; index < pages.length; index++) {
+            const page = pages[index];
+
+            const canvas = await html2canvas(page, {
+                scale: 1,
                 useCORS: true,
                 allowTaint: false,
                 logging: false,
                 backgroundColor: "#ffffff",
                 scrollX: 0,
-                scrollY: 0
-            },
+                scrollY: 0,
+                windowWidth: page.scrollWidth,
+                windowHeight: page.scrollHeight
+            });
 
-            jsPDF: {
-                unit: "mm",
-                format: "a4",
-                orientation: "portrait",
-                compress: true
+            const imageData = canvas.toDataURL("image/jpeg", 0.9);
+
+            if (index > 0) {
+                pdf.addPage("a4", "portrait");
             }
-        };
 
-        // Save directly instead of opening about:blank
-        await html2pdf()
-            .set(options)
-            .from(element)
-            .save();
+            pdf.addImage(
+                imageData,
+                "JPEG",
+                0,
+                0,
+                210,
+                297,
+                undefined,
+                "FAST"
+            );
+
+            // Release canvas memory before creating the next page
+            canvas.width = 1;
+            canvas.height = 1;
+        }
+
+        const resortName =
+            configData.resort_info.name || "MEERA_VALLEY_RESORT";
+
+        const filename =
+            `Quotation_${resortName.replace(/\s+/g, "_")}.pdf`;
+
+        pdf.save(filename);
 
     } catch (error) {
-        console.error("PDF generation error:", error);
+        console.error("PDF generation failed:", error);
 
         alert(
-            "PDF could not be generated. Please refresh the page and try again."
+            "PDF generation failed: " +
+            (error.message || "Unknown error")
         );
     } finally {
         document.body.classList.remove("is-generating-pdf");
-
         btn.innerHTML = originalText;
         btn.disabled = false;
     }
