@@ -650,51 +650,38 @@ textarea {
   .sidebar-content {
     padding: 15px;
   }
-}
 
-/* Responsive scaling of A4 preview to fit phone screens */
-@media (max-width: 820px) {
+  /* Responsive layout for the quotation preview on phone screens */
   .pdf-page {
-    transform: scale(0.85);
-    transform-origin: top center;
-    margin-bottom: -100px;
-  }
-}
-
-@media (max-width: 680px) {
-  .pdf-page {
-    transform: scale(0.7);
-    transform-origin: top center;
-    margin-bottom: -250px;
-  }
-}
-
-@media (max-width: 520px) {
-  .pdf-page {
-    transform: scale(0.55);
-    transform-origin: top center;
-    margin-bottom: -400px;
-  }
-}
-
-@media (max-width: 415px) {
-  .pdf-page {
-    transform: scale(0.45);
-    transform-origin: top center;
-    margin-bottom: -500px;
-  }
-}
-
-@media (max-width: 360px) {
-  .pdf-page {
-    transform: scale(0.4);
-    transform-origin: top center;
-    margin-bottom: -550px;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 20px 15px !important;
+    transform: none !important;
+    margin-bottom: 20px !important;
+    box-shadow: none !important;
   }
 }
 
 /* Force normal A4 dimensions during PDF generation, ignoring mobile screen scaling */
 body.is-generating-pdf .pdf-page {
+  width: 210mm !important;
+  height: 297mm !important;
+  min-height: 297mm !important;
+  padding: 15mm 20mm !important;
   transform: none !important;
   margin: 0 !important;
+  box-shadow: var(--shadow-preview) !important;
+}
+
+@media (max-width: 600px) {
+  /* On mobile preview, override the inline grid-template-columns to stack vertically for readability */
+  body:not(.is-generating-pdf) .meal-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+  }
+  body:not(.is-generating-pdf) .meal-col:not(:last-child) {
+    border-right: none !important;
+    border-bottom: 1px solid var(--primary);
+  }
 }
