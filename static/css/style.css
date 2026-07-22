@@ -685,3 +685,21 @@ body.is-generating-pdf .pdf-page {
     border-bottom: 1px solid var(--primary);
   }
 }
+body.is-generating-pdf #preview-workspace {
+    display: block !important;
+    width: 210mm !important;
+    gap: 0 !important;
+}
+
+body.is-generating-pdf .pdf-page {
+    width: 210mm !important;
+    height: 297mm !important;
+    min-height: 297mm !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+}
+
+body.is-generating-pdf .page-break {
+    page-break-before: always !important;
+    break-before: page !important;
+}
