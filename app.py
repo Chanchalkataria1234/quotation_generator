@@ -509,7 +509,18 @@ def generate_pdf():
     if request.method == 'OPTIONS':
         return '', 200
         
-    data = request.json
+    if request.is_json:
+        data = request.json
+    else:
+        data_str = request.form.get("data")
+        if data_str:
+            try:
+                data = json.loads(data_str)
+            except Exception:
+                data = None
+        else:
+            data = None
+            
     if not data:
         return jsonify({"error": "No data provided"}), 400
         

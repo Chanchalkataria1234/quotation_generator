@@ -3,6 +3,13 @@ let configData = {};
 document.addEventListener('DOMContentLoaded', () => {
     fetchConfig();
     setupEventListeners();
+    
+    // Ping backend to wake it up if it is sleeping (e.g. Render free tier)
+    let pingUrl = '/api/config';
+    if (window.location.hostname.includes('github.io')) {
+        pingUrl = 'https://stay-quotation-generator.onrender.com/api/config';
+    }
+    fetch(pingUrl).catch(err => console.log("Background wake-up ping failed:", err));
 });
 
 const DEFAULT_CONFIG = {
@@ -634,12 +641,6 @@ function updatePreview() {
 
 // Generate & Download PDF
 function downloadPDF() {
-    // Add loading feedback
-    const btn = document.getElementById('btn-download-pdf');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = 'Generating PDF...';
-    btn.disabled = true;
-
     // Collect latest form data first to ensure it's up to date
     collectFormData();
 
@@ -649,42 +650,30 @@ function downloadPDF() {
         apiUrl = 'https://stay-quotation-generator.onrender.com/api/generate-pdf';
     }
 
-    fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(configData)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Server returned ' + response.status + ' ' + response.statusText);
-        }
-        return response.blob();
-    })
-    .then(blob => {
-        // Trigger browser file download
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        
-        const resortName = configData.resort_info.name || 'Resort';
-        a.download = `Quotation_${resortName.replace(/\s+/g, '_')}.pdf`;
-        
-        document.body.appendChild(a);
-        a.click();
-        
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        
+    // Add loading feedback (visual indicator that reverts after 5 seconds)
+    const btn = document.getElementById('btn-download-pdf');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = 'Generating PDF...';
+    btn.disabled = true;
+    setTimeout(() => {
         btn.innerHTML = originalText;
         btn.disabled = false;
-    })
-    .catch(err => {
-        console.error('PDF generation error:', err);
-        alert('Failed to generate PDF. Make sure the server/API is running and accessible.');
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    });
+    }, 5000);
+
+    // Create a hidden form to submit synchronously (avoiding async download blocks on iOS Safari)
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = apiUrl;
+    form.style.display = 'none';
+
+    // Add the data as a hidden input
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'data';
+    input.value = JSON.stringify(configData);
+    form.appendChild(input);
+
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
 }
