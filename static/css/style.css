@@ -692,3 +692,9 @@ textarea {
     margin-bottom: -550px;
   }
 }
+
+/* Force normal A4 dimensions during PDF generation, ignoring mobile screen scaling */
+body.is-generating-pdf .pdf-page {
+  transform: none !important;
+  margin: 0 !important;
+}

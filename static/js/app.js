@@ -664,6 +664,9 @@ function downloadPDF() {
     btn.innerHTML = 'Generating PDF...';
     btn.disabled = true;
 
+    // Apply generation class to temporarily disable CSS scaling transforms
+    document.body.classList.add('is-generating-pdf');
+
     if (isMobile) {
         // Pre-open a blank window synchronously to bypass iOS Safari pop-up blocker
         const newWindow = window.open("", "_blank");
@@ -679,23 +682,27 @@ function downloadPDF() {
             } else {
                 window.location.href = url;
             }
+            document.body.classList.remove('is-generating-pdf');
             btn.innerHTML = originalText;
             btn.disabled = false;
         }).catch(err => {
             console.error('PDF generation error:', err);
             alert('Failed to generate PDF. Check console logs.');
             if (newWindow) newWindow.close();
+            document.body.classList.remove('is-generating-pdf');
             btn.innerHTML = originalText;
             btn.disabled = false;
         });
     } else {
         // Desktop: Direct download using html2pdf's save method
         html2pdf().set(opt).from(element).save().then(() => {
+            document.body.classList.remove('is-generating-pdf');
             btn.innerHTML = originalText;
             btn.disabled = false;
         }).catch(err => {
             console.error('PDF generation error:', err);
             alert('Failed to generate PDF. Check console logs.');
+            document.body.classList.remove('is-generating-pdf');
             btn.innerHTML = originalText;
             btn.disabled = false;
         });
