@@ -504,10 +504,13 @@ def add_cors_headers(response):
     response.headers['Access-Control-Allow-Methods'] = 'GET,PUT,POST,DELETE,OPTIONS'
     return response
 
-@app.route('/api/generate-pdf', methods=['POST', 'OPTIONS'])
+@app.route('/api/generate-pdf', methods=['GET', 'POST', 'OPTIONS'])
 def generate_pdf():
     if request.method == 'OPTIONS':
         return '', 200
+        
+    if request.method == 'GET':
+        return "Quotation Generator API is running. Please use the application interface to download your PDF.", 200
         
     if request.is_json:
         data = request.json
