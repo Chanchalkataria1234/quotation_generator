@@ -633,94 +633,97 @@ function updatePreview() {
 }
 
 // Generate & Download/Preview PDF
-function downloadPDF() {
-    // Collect latest form data first to ensure it's up to date
+async function downloadPDF() {
     collectFormData();
+    updatePreview();
 
-    const element = document.getElementById('preview-workspace');
-    const resortName = configData.resort_info.name || 'Resort';
-    const filename = `Quotation_${resortName.replace(/\s+/g, '_')}.pdf`;
-
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-    // Set html2pdf options
-    const opt = {
-        margin:       0,
-        filename:     filename,
-        image:        { type: 'jpeg', quality: 0.95 },
-        html2canvas:  { 
-            scale: 1.8, // Safe scale for mobile canvas memory limits
-            useCORS: true,
-            logging: false,
-            letterRendering: true
-        },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak:    { mode: ['css', 'legacy'] }
-    };
-
-    // Add loading feedback
-    const btn = document.getElementById('btn-download-pdf');
+    const btn = document.getElementById("btn-download-pdf");
     const originalText = btn.innerHTML;
-    btn.innerHTML = 'Generating PDF...';
+
+    const resortName = configData.resort_info.name || "Resort";
+    const filename =
+        `Quotation_${resortName.replace(/\s+/g, "_")}.pdf`;
+
+    btn.innerHTML = "Generating PDF...";
     btn.disabled = true;
 
-    // Apply generation class to temporarily disable CSS scaling transforms
-    document.body.classList.add('is-generating-pdf');
+    document.body.classList.add("is-generating-pdf");
 
-    if (isMobile) {
-        // Pre-open a blank window synchronously to bypass iOS Safari pop-up blocker
-        const newWindow = window.open("", "_blank");
-        if (newWindow) {
-            newWindow.document.title = "Generating PDF...";
-            newWindow.document.body.innerHTML = "<h2 style='font-family:sans-serif; text-align:center; margin-top:20%; color:#157366;'>Generating your PDF. Please wait...</h2>";
+    try {
+        // Wait for fonts before capturing the quotation
+        if (document.fonts && document.fonts.ready) {
+            await document.fonts.ready;
         }
 
-        html2pdf().set(opt).from(element).toPdf().outputPdf('blob').then(blob => {
-            // Convert to a data: URL instead of a blob: URL.
-            // blob: URLs are scoped to the window/document that created them, so handing
-            // one to a *different* window (the pre-opened tab) shows blank on iOS Safari.
-            // data: URLs are self-contained and work across windows.
-            const reader = new FileReader();
-            reader.onload = function () {
-                const dataUrl = reader.result;
-                if (newWindow) {
-                    newWindow.location.href = dataUrl;
-                } else {
-                    window.location.href = dataUrl;
+        // Wait for all images, including the resort logo
+        const images = Array.from(
+            document.querySelectorAll("#preview-workspace img")
+        );
+
+        await Promise.all(
+            images.map((img) => {
+                if (img.complete) {
+                    return Promise.resolve();
                 }
-                document.body.classList.remove('is-generating-pdf');
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            };
-            reader.onerror = function (err) {
-                console.error('Failed to read PDF blob:', err);
-                alert('Failed to generate PDF. Check console logs.');
-                if (newWindow) newWindow.close();
-                document.body.classList.remove('is-generating-pdf');
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            };
-            reader.readAsDataURL(blob);
-        }).catch(err => {
-            console.error('PDF generation error:', err);
-            alert('Failed to generate PDF. Check console logs.');
-            if (newWindow) newWindow.close();
-            document.body.classList.remove('is-generating-pdf');
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        });
-    } else {
-        // Desktop: Direct download using html2pdf's save method
-        html2pdf().set(opt).from(element).save().then(() => {
-            document.body.classList.remove('is-generating-pdf');
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        }).catch(err => {
-            console.error('PDF generation error:', err);
-            alert('Failed to generate PDF. Check console logs.');
-            document.body.classList.remove('is-generating-pdf');
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        });
+
+                return new Promise((resolve) => {
+                    img.onload = resolve;
+                    img.onerror = resolve;
+                });
+            })
+        );
+
+        const element = document.getElementById("preview-workspace");
+
+        const options = {
+            margin: 0,
+            filename: filename,
+
+            image: {
+                type: "jpeg",
+                quality: 0.92
+            },
+
+            html2canvas: {
+                // Lower scale prevents iPhone memory/canvas problems
+                scale: 1.2,
+                useCORS: true,
+                allowTaint: false,
+                logging: false,
+                backgroundColor: "#ffffff",
+                scrollX: 0,
+                scrollY: 0
+            },
+
+            jsPDF: {
+                unit: "mm",
+                format: "a4",
+                orientation: "portrait",
+                compress: true
+            },
+
+            pagebreak: {
+                mode: ["css", "legacy"],
+                after: [".page-break"]
+            }
+        };
+
+        // Save directly instead of opening about:blank
+        await html2pdf()
+            .set(options)
+            .from(element)
+            .save();
+
+    } catch (error) {
+        console.error("PDF generation error:", error);
+
+        alert(
+            "PDF could not be generated. Please refresh the page and try again."
+        );
+    } finally {
+        document.body.classList.remove("is-generating-pdf");
+
+        btn.innerHTML = originalText;
+        btn.disabled = false;
     }
 }
