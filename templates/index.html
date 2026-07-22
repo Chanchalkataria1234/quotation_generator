@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stay Quotation & Menu Planner - Meera Valley Resort</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Inter:wght@400;500;600&family=Montserrat:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- html2pdf.js library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+    integrity="sha512-Ap2dO/S4qP2h7H9u4M9jF8z/zF1pW2/2A169n+A/b3gQ8k9z2Xf1qT7K5z/A169n+A/b3g==" crossorigin="anonymous"
+    referrerpolicy="no-referrer"></script>
+
+  <!-- CSS Styles -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+  <div class="app-container">
+
+    <!-- Sidebar Control Panel -->
+    <div class="editor-sidebar">
+      <div class="sidebar-header">
+        <div class="logo-icon">Q</div>
+        <h2>Quotation Editor</h2>
+      </div>
+
+      <div class="sidebar-content">
+        <!-- Resort Information -->
+        <div class="form-section">
+          <div class="section-title">Resort Details</div>
+          <div class="form-group">
+            <label for="resort_name">Resort Name</label>
+            <input type="text" id="resort_name" value="MEERA VALLEY RESORT">
+          </div>
+          <div class="form-row" style="margin-top: 10px;">
+            <div class="form-group">
+              <label for="resort_subtitle">Subtitle / Partner</label>
+              <input type="text" id="resort_subtitle" value="By Nexottel - Udaipur">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top: 10px;">
+            <label for="resort_footer">Footer Text</label>
+            <input type="text" id="resort_footer"
+              value="Meera Valley Resort By Nexottel | Udaipur | Quotation subject to availability">
+          </div>
+        </div>
+
+        <!-- Booking Details -->
+        <div class="form-section">
+          <div class="section-title">Booking Parameters</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="check_in">Check-in Date & Time</label>
+              <input type="datetime-local" id="check_in">
+            </div>
+            <div class="form-group">
+              <label for="check_out">Check-out Date & Time</label>
+              <input type="datetime-local" id="check_out">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="guests">Guests count</label>
+              <input type="number" id="guests" min="1" value="25">
+            </div>
+            <div class="form-group">
+              <label for="guest_status">Guest Status</label>
+              <select id="guest_status">
+                <option value="Returning / Old Guest">Returning / Old Guest</option>
+                <option value="New Guest">New Guest</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Room Pricing Details -->
+        <div class="form-section">
+          <div class="section-title">Room Occupancy & Rates</div>
+
+          <!-- Triple Occupancy -->
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+            <span style="font-size: 12px; color: var(--accent-gold); font-weight: 600;">Triple Occupancy Room</span>
+            <input type="checkbox" id="include_room_triple" checked style="width: auto; margin: 0; cursor: pointer;">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="triple_qty">Quantity (Rooms)</label>
+              <input type="number" id="triple_qty" min="0" value="7">
+            </div>
+            <div class="form-group">
+              <label for="triple_rate">Price / Night (₹)</label>
+              <input type="number" id="triple_rate" min="0" value="2000">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 15px;">
+            <label for="triple_inclusion">Triple Inclusion Text</label>
+            <input type="text" id="triple_inclusion" value="1 mattress included in each room">
+          </div>
+
+          <!-- Double Occupancy -->
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+            <span style="font-size: 12px; color: var(--accent-gold); font-weight: 600;">Double Occupancy Room</span>
+            <input type="checkbox" id="include_room_double" checked style="width: auto; margin: 0; cursor: pointer;">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="double_qty">Quantity (Rooms)</label>
+              <input type="number" id="double_qty" min="0" value="2">
+            </div>
+            <div class="form-group">
+              <label for="double_rate">Price / Night (₹)</label>
+              <input type="number" id="double_rate" min="0" value="1800">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 15px;">
+            <label for="double_inclusion">Double Inclusion Text</label>
+            <input type="text" id="double_inclusion" value="Double occupancy">
+          </div>
+
+          <!-- Quad Occupancy (4 Occupancy) -->
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+            <span style="font-size: 12px; color: var(--accent-gold); font-weight: 600;">Quad Occupancy (4 Occupancy) Room</span>
+            <input type="checkbox" id="include_room_quad" checked style="width: auto; margin: 0; cursor: pointer;">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="quad_qty">Quantity (Rooms)</label>
+              <input type="number" id="quad_qty" min="0" value="0">
+            </div>
+            <div class="form-group">
+              <label for="quad_rate">Price / Night (₹)</label>
+              <input type="number" id="quad_rate" min="0" value="2400">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="quad_inclusion">Quad Inclusion Text</label>
+            <input type="text" id="quad_inclusion" value="Quad occupancy">
+          </div>
+        </div>
+
+        <!-- Meal Plan Price Adjustments -->
+        <div class="form-section">
+          <div class="section-title">Meal Rates (per person / night)</div>
+          <div
+            style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 10px;">
+            <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer;">
+              <input type="checkbox" id="include_pkg_room_only" checked style="width: auto; margin: 0;"> Room Only
+            </label>
+            <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer;">
+              <input type="checkbox" id="include_pkg_cp" checked style="width: auto; margin: 0;"> CP
+            </label>
+            <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer;">
+              <input type="checkbox" id="include_pkg_map" checked style="width: auto; margin: 0;"> MAP
+            </label>
+            <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer;">
+              <input type="checkbox" id="include_pkg_ap" checked style="width: auto; margin: 0;"> AP
+            </label>
+            <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer;">
+              <input type="checkbox" id="include_pkg_ap_hi_tea" checked style="width: auto; margin: 0;"> AP+Hi Tea
+            </label>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="rate_cp">CP Rate (₹)</label>
+              <input type="number" id="rate_cp" value="250">
+            </div>
+            <div class="form-group">
+              <label for="rate_map">MAP Rate (₹)</label>
+              <input type="number" id="rate_map" value="600">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="rate_ap">AP Rate (₹)</label>
+              <input type="number" id="rate_ap" value="950">
+            </div>
+            <div class="form-group">
+              <label for="rate_ap_hi_tea">AP + Hi Tea Rate (₹)</label>
+              <input type="number" id="rate_ap_hi_tea" value="1250">
+            </div>
+          </div>
+        </div>
+
+        <!-- Menu Editors -->
+        <div class="form-section">
+          <div class="section-title">
+            <span>Menu Setup - Breakfast</span>
+            <input type="checkbox" id="include_breakfast" checked style="width: auto; margin: 0;">
+          </div>
+          <div id="breakfast-list-container" class="item-list-editor"></div>
+          <button type="button" class="btn-add-item" id="add-breakfast-item">+ Add Item</button>
+        </div>
+
+        <div class="form-section">
+          <div class="section-title">
+            <span>Menu Setup - Lunch</span>
+            <input type="checkbox" id="include_lunch" checked style="width: auto; margin: 0;">
+          </div>
+          <div id="lunch-list-container" class="item-list-editor"></div>
+          <button type="button" class="btn-add-item" id="add-lunch-item">+ Add Item</button>
+        </div>
+
+        <div class="form-section">
+          <div class="section-title">
+            <span>Menu Setup - Hi Tea</span>
+            <input type="checkbox" id="include_hi_tea" checked style="width: auto; margin: 0;">
+          </div>
+          <div id="hi_tea-list-container" class="item-list-editor"></div>
+          <button type="button" class="btn-add-item" id="add-hi_tea-item">+ Add Item</button>
+        </div>
+
+        <div class="form-section">
+          <div class="section-title">
+            <span>Menu Setup - Dinner</span>
+            <input type="checkbox" id="include_dinner" checked style="width: auto; margin: 0;">
+          </div>
+          <div id="dinner-list-container" class="item-list-editor"></div>
+          <button type="button" class="btn-add-item" id="add-dinner-item">+ Add Item</button>
+        </div>
+
+        <!-- Important Notes Editor -->
+        <div class="form-section">
+          <div class="section-title">Important Notes</div>
+          <div id="notes-list-container" class="item-list-editor"></div>
+          <button type="button" class="btn-add-item" id="add-note-item">+ Add Note</button>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <button id="btn-save" class="btn-primary" style="width: 100%;">Save New Defaults</button>
+        <div style="display: flex; gap: 10px;">
+          <button id="btn-reset" class="btn-danger-outline" style="flex: 1;">Reset Defaults</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Preview Screen -->
+    <div class="preview-container">
+
+      <!-- Top Action Ribbon -->
+      <div class="preview-actions">
+        <button id="btn-download-pdf" class="btn-primary">
+          <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" stroke-width="2.5"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+          </svg>
+          Download PDF Quotation
+        </button>
+      </div>
+
+      <!-- Printable area representing A4 margins -->
+      <div id="preview-workspace" style="display: flex; flex-direction: column; gap: 20px;">
+
+        <!-- PAGE 1 -->
+        <div class="pdf-page" id="page-1">
+          <div class="pdf-content">
+            <!-- Header -->
+            <div class="pdf-header">
+              <img src="/static/meera_valley_logo.jpg" alt="Meera Valley Resort By Nexottel"
+                style="height: 120px; object-fit: contain; margin-bottom: 5px;">
+              <div class="quotation-title">PREMIUM STAY QUOTATION</div>
+            </div>
+
+            <!-- Booking Info Table -->
+            <table class="summary-table">
+              <tr>
+                <td class="label-cell">Check-in</td>
+                <td class="value-cell" id="pv-check-in">-</td>
+                <td class="label-cell">Check-out</td>
+                <td class="value-cell" id="pv-check-out">-</td>
+              </tr>
+              <tr>
+                <td class="label-cell">Stay</td>
+                <td class="value-cell" id="pv-stay">-</td>
+                <td class="label-cell">Guests</td>
+                <td class="value-cell" id="pv-guests">-</td>
+              </tr>
+              <tr>
+                <td class="label-cell">Rooms</td>
+                <td class="value-cell" id="pv-rooms">-</td>
+                <td class="label-cell">Guest Status</td>
+                <td class="value-cell" id="pv-guest-status">-</td>
+              </tr>
+            </table>
+
+            <!-- Discount Notice Box -->
+            <div class="discount-banner" id="pv-discount-banner">
+              Special Returning Guest Discount
+              <div style="font-weight: 500; font-size: 11px; margin-top: 3px; color: #856404;">
+                As a valued old guest, an additional discounted rate has already been provided in this quotation.
+              </div>
+            </div>
+
+            <!-- Room Arrangement -->
+            <div>
+              <div class="section-heading">Room Arrangement</div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Room Type</th>
+                    <th>Quantity</th>
+                    <th>Inclusion</th>
+                    <th>Rate / Night</th>
+                    <th class="text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody id="pv-room-body">
+                  <!-- Generated dynamically by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Package Options -->
+            <div>
+              <div class="section-heading">Available Package Options</div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Plan</th>
+                    <th>Includes</th>
+                    <th>Meal Rate</th>
+                    <th>Calculation</th>
+                    <th class="text-right">Grand Total</th>
+                  </tr>
+                </thead>
+                <tbody id="pv-package-body">
+                  <!-- Generated by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Page 1 Footer -->
+          <div class="pdf-footer">
+            <span class="pdf-footer-text">-</span>
+          </div>
+        </div>
+
+        <!-- PAGE 2 -->
+        <div class="pdf-page page-break" id="page-2">
+          <div class="pdf-content">
+            <!-- Header -->
+            <div class="pdf-header">
+              <img src="/static/meera_valley_logo.jpg" alt="Meera Valley Resort By Nexottel"
+                style="height: 120px; object-fit: contain; margin-bottom: 5px;">
+              <div class="quotation-title" style="border: none; font-size: 16px; margin-top: 5px;">Meal Details</div>
+              <div style="font-size: 11px; color: var(--text-muted); font-weight: 500; margin-top: 2px;">
+                Meals will be served according to the selected CP, MAP, AP or AP + Hi Tea package.
+              </div>
+            </div>
+
+            <!-- Meal Matrix -->
+            <div class="meal-grid">
+              <div class="meal-col">
+                <div class="meal-header">Breakfast</div>
+                <ul class="meal-items" id="pv-menu-breakfast"></ul>
+              </div>
+              <div class="meal-col">
+                <div class="meal-header">Lunch</div>
+                <ul class="meal-items" id="pv-menu-lunch"></ul>
+              </div>
+              <div class="meal-col">
+                <div class="meal-header">Hi Tea</div>
+                <ul class="meal-items" id="pv-menu-hi_tea"></ul>
+              </div>
+              <div class="meal-col">
+                <div class="meal-header">Dinner</div>
+                <ul class="meal-items" id="pv-menu-dinner"></ul>
+              </div>
+            </div>
+
+            <!-- Important Notes -->
+            <div>
+              <div class="section-heading">Important Notes</div>
+              <div class="notes-container">
+                <ul class="notes-list" id="pv-notes-list">
+                  <!-- Generated by JavaScript -->
+                </ul>
+              </div>
+            </div>
+
+            <!-- Thank You Closing -->
+            <div class="closing-block">
+              We look forward to welcoming you again to Meera Valley Resort.<br>
+              <span style="font-size: 14px; font-weight: 800;">Thank You</span>
+            </div>
+          </div>
+
+          <!-- Page 2 Footer -->
+          <div class="pdf-footer">
+            <span class="pdf-footer-text">-</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- App logic -->
+  <script src="/static/js/app.js"></script>
+</body>
+
+</html>
