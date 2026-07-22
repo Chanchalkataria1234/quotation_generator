@@ -634,36 +634,56 @@ function updatePreview() {
 
 // Generate & Download PDF
 function downloadPDF() {
-    const element = document.getElementById('preview-workspace');
-    
-    // Set html2pdf options
-    const resortName = configData.resort_info.name || 'Resort';
-    const opt = {
-        margin:       0,
-        filename:     `Quotation_${resortName.replace(/\s+/g, '_')}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { 
-            scale: 2.5, // High resolution scale
-            useCORS: true,
-            logging: false,
-            letterRendering: true
-        },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak:    { mode: ['css', 'legacy'] }
-    };
-    
     // Add loading feedback
     const btn = document.getElementById('btn-download-pdf');
     const originalText = btn.innerHTML;
     btn.innerHTML = 'Generating PDF...';
     btn.disabled = true;
 
-    html2pdf().set(opt).from(element).save().then(() => {
+    // Collect latest form data first to ensure it's up to date
+    collectFormData();
+
+    // Determine the correct API endpoint
+    let apiUrl = '/api/generate-pdf';
+    if (window.location.hostname.includes('github.io')) {
+        apiUrl = 'https://stay-quotation-generator.onrender.com/api/generate-pdf';
+    }
+
+    fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(configData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Server returned ' + response.status + ' ' + response.statusText);
+        }
+        return response.blob();
+    })
+    .then(blob => {
+        // Trigger browser file download
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        
+        const resortName = configData.resort_info.name || 'Resort';
+        a.download = `Quotation_${resortName.replace(/\s+/g, '_')}.pdf`;
+        
+        document.body.appendChild(a);
+        a.click();
+        
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
         btn.innerHTML = originalText;
         btn.disabled = false;
-    }).catch(err => {
+    })
+    .catch(err => {
         console.error('PDF generation error:', err);
-        alert('Failed to generate PDF. Check console logs.');
+        alert('Failed to generate PDF. Make sure the server/API is running and accessible.');
         btn.innerHTML = originalText;
         btn.disabled = false;
     });
