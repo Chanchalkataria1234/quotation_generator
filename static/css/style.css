@@ -703,3 +703,34 @@ body.is-generating-pdf .page-break {
     page-break-before: always !important;
     break-before: page !important;
 }
+/* Keep visual spacing in the browser preview */
+#preview-workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* PDF generation layout */
+body.is-generating-pdf #preview-workspace {
+    display: block !important;
+    width: 210mm !important;
+    gap: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body.is-generating-pdf .pdf-page {
+    display: block !important;
+    width: 210mm !important;
+    height: 297mm !important;
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+    page-break-before: auto !important;
+    page-break-after: auto !important;
+    break-before: auto !important;
+    break-after: auto !important;
+}
