@@ -675,16 +675,32 @@ function downloadPDF() {
             newWindow.document.body.innerHTML = "<h2 style='font-family:sans-serif; text-align:center; margin-top:20%; color:#157366;'>Generating your PDF. Please wait...</h2>";
         }
 
-    html2pdf().set(opt).from(element).toPdf().outputPdf('blob').then(blob => {
-            const url = URL.createObjectURL(blob);
-            if (newWindow) {
-                newWindow.location.href = url;
-            } else {
-                window.location.href = url;
-            }
-            document.body.classList.remove('is-generating-pdf');
-            btn.innerHTML = originalText;
-            btn.disabled = false;
+        html2pdf().set(opt).from(element).toPdf().outputPdf('blob').then(blob => {
+            // Convert to a data: URL instead of a blob: URL.
+            // blob: URLs are scoped to the window/document that created them, so handing
+            // one to a *different* window (the pre-opened tab) shows blank on iOS Safari.
+            // data: URLs are self-contained and work across windows.
+            const reader = new FileReader();
+            reader.onload = function () {
+                const dataUrl = reader.result;
+                if (newWindow) {
+                    newWindow.location.href = dataUrl;
+                } else {
+                    window.location.href = dataUrl;
+                }
+                document.body.classList.remove('is-generating-pdf');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            };
+            reader.onerror = function (err) {
+                console.error('Failed to read PDF blob:', err);
+                alert('Failed to generate PDF. Check console logs.');
+                if (newWindow) newWindow.close();
+                document.body.classList.remove('is-generating-pdf');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            };
+            reader.readAsDataURL(blob);
         }).catch(err => {
             console.error('PDF generation error:', err);
             alert('Failed to generate PDF. Check console logs.');
