@@ -675,7 +675,7 @@ function downloadPDF() {
             newWindow.document.body.innerHTML = "<h2 style='font-family:sans-serif; text-align:center; margin-top:20%; color:#157366;'>Generating your PDF. Please wait...</h2>";
         }
 
-        html2pdf().set(opt).from(element).toPdf().outputPdf('blob').then(blob => {
+    html2pdf().set(opt).from(element).toPdf().outputPdf('blob').then(blob => {
             const url = URL.createObjectURL(blob);
             if (newWindow) {
                 newWindow.location.href = url;
